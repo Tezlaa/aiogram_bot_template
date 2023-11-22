@@ -1,7 +1,7 @@
-from models.base import DatabaseTable
+from models.base import database
 
 
-class TestTable(DatabaseTable):
+class TestTable(database.Table):
     def create_table(self):
         sql = """
             CREATE TABLE IF NOT EXISTS test(
