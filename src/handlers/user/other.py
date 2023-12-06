@@ -1,63 +1,29 @@
-import logging
+from aiogram import F, Dispatcher, types
+from aiogram.filters import CommandStart
 
-from aiogram import Dispatcher, types
-from aiogram.dispatcher.filters import Text
+from tools.decorators import log_message
 
-import createBot
-from keyboards.reply import menu_kb
+from keyboards.inline import button_test
 
 
+@log_message
 async def start(msg: types.Message):
-    logging.info(f'| {msg.from_user.id} | @{msg.from_user.username} > "{msg.text}"')
+    if not msg.from_user:
+        return
     
-    createBot.database.create_profile(int(msg.from_user.id), f'@{msg.from_user.username}')
-    await msg.answer("💵<b>Здравствуйте!</b> Я являюсь ботом для отправки резюме."
-                     " <b>Моя задача - помочь вам отправить ваше резюме и контактную "
-                     "информацию работодателю для увеличения ваших шансов на получение вакансии.</b>\n"
-                     "<em>Выбери интересующее меню снизу⤵</em>",
-                     reply_markup=menu_kb)
+    await msg.answer("<b>Hello!</b>",
+                     reply_markup=button_test.as_markup())
 
 
-async def profile(msg: types.Message):
-    logging.info(f'| {msg.from_user.id} | @{msg.from_user.username} > "{msg.text}"')
-
-    user_info_db = createBot.database.get_info_user(msg.from_user.id)
+async def button_callback(callback: types.CallbackQuery):
+    if not callback.message:
+        return
     
-    result_info = []
-    for field in user_info_db:
-        if field is None:
-            field = "Нет данных"
-        elif field == int(msg.from_user.id):
-            continue
-        
-        result_info.append(field)
-    
-    await msg.answer(f"<b>🖥Профиль</b>\n\nТелеграм: <em>{result_info[0]}</em>\nИмя: <em>{result_info[1]}</em>\n"
-                     f"Возраст: <em>{result_info[2]}</em>")
-
-
-async def feedback(msg: types.Message):
-    logging.info(f'| {msg.from_user.id} | @{msg.from_user.username} > "{msg.text}"')
-
-    await msg.answer("<b>🔻Требования к кандидату:</b>\n"
-                     "  🔸Грамотная речь\n"
-                     "  🔸Желание работать на результат\n"
-                     "  🔸Высокая коммуникабельность\n"
-                     "  🔸Ответственность и исполнительность\n"
-                     "  🔸Стрессоустойчивость\n\n"
-                     "<b>🔻Обязанности:</b>\n"
-                     "  🔸Выполнение работы на высоком уровне\n"
-                     "  🔸Работа с Клиентами\n"
-                     "  🔸Сопровождение клиентов\n\n"
-                     "<b>🔻Условия работы:</b>\n"
-                     "  🔸График работы 9:00-19:00, ПН-ПТ\n"
-                     "  🔸Процент от выполненной работы ~200-5000$\n"
-                     "  🔸Еженедельные выплаты\n"
-                     "  🔸Современный офис с генератором и Starlink\n"
-                     "  🔸Обучение и профессиональное развитие\n")
+    await callback.message.answer(f'Callback data: {callback.data}',
+                                  reply_markup=button_test.as_markup())
     
 
 def register_other_handlers(dp: Dispatcher) -> None:
-    dp.register_message_handler(start, commands=['start'])
-    dp.register_message_handler(profile, Text(equals="🖥Профиль"))
-    dp.register_message_handler(feedback, Text(equals="❗Условия и требования"))
+    dp.message.register(start, CommandStart)
+    dp.callback_query.register(button_callback,
+                               F.text.startswith == button_test.callback_by_button_name('BUTTON'))

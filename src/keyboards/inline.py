@@ -1,16 +1,9 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, \
-    KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from keyboards.utils import Button, ButtonType
 
 
-none_age = InlineKeyboardMarkup(row_width=1).add(
-    InlineKeyboardButton(text="Предпочитаю не указывать", callback_data='none_age'),
-)
-
-none_experience = InlineKeyboardMarkup(row_width=1).add(
-    InlineKeyboardButton(text="Не имею опыта", callback_data='none_experience'),
-)
-
-send_resume_question = InlineKeyboardMarkup(row_width=1).add(
-    InlineKeyboardButton(text="Всё верно отправить данные", callback_data='finish__send_resume'),
-    InlineKeyboardButton(text="Заполнить заново", callback_data='finish__fill_in_again'),
-)
+button_test = Button([
+    ButtonType(text="BUTTON", callback_data="CALLBACK_DATA"),
+    ButtonType(text="BUTTON1", callback_data="CALLBACK_DATA1"),
+    ButtonType(text="BUTTON2", callback_data="CALLBACK_DATA2"),
+    ButtonType(text="BUTTON3", callback_data="CALLBACK_DATA3"),
+], (1, 3))
